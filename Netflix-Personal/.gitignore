@@ -1,0 +1,50 @@
+# --- Logs y Diagnósticos ---
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Dependencias (NUNCA subir esto) ---
+node_modules
+.pnpm-store
+
+# --- Build de Producción ---
+# Vite genera la carpeta 'dist', Create React App usa 'build'
+dist
+dist-ssr
+build
+
+# --- Variables de Entorno (SEGURIDAD CRÍTICA) ---
+# Ignora cualquier archivo de configuración local que pueda tener tu API KEY
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Excepción: Si creas un archivo de ejemplo (sin claves reales), ese sí se sube
+!.env.example
+
+# --- Archivos del Sistema Operativo (Basura) ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# --- Editores e IDEs ---
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# --- Testing (Por si agregas pruebas en el futuro) ---
+coverage/
+
+# --- Vite Types (Si usaras TypeScript en el futuro) ---
+*.tsbuildinfo
