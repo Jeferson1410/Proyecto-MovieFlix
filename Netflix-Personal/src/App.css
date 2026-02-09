@@ -558,14 +558,16 @@ body {
   width: 100px;   /* Ancho más estrecho para alinear mejor */
   text-align: center; /* Alinea texto al centro */
   cursor: pointer;
-  transition: transform 0.3s;
+  transition: transform 0.2s, background-color 0.2s;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .cast-card:hover {
-  transform: scale(1.05);
+  transform: translateY(-5px);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
 }
 
 .cast-img {

@@ -134,7 +134,6 @@ function App() {
     } catch (error) { console.log(error); }
   };
 
-  // --- 4. FUNCIÓN PARA BUSCAR SIMILARES (Corregida y movida aquí dentro) ---
   // --- 4. FUNCIÓN PARA BUSCAR SIMILARES (MEJORADA) ---
   const fetchSimilarMovies = async (currentMovie) => {
     try {
@@ -160,6 +159,31 @@ function App() {
       }
     } catch (error) {
       console.error("Error buscando similares:", error);
+    }
+  };
+
+  // --- 5. BUSCAR PELÍCULAS DE UN ACTOR ---
+  const fetchMoviesByActor = async (actorId, actorName) => {
+    try {
+      // Cerramos el modal actual
+      closeDetail();
+      
+      // Cambiamos el título de la grilla para que el usuario sepa qué está viendo
+      setCategoryTitle(`Películas de: ${actorName}`);
+      setSearchTerm(""); // Limpiamos búsqueda de texto
+      
+      // Endpoint: Discover filtrando por persona (with_people)
+      const { results } = await fetch(
+        `${API_URL}/discover/movie?api_key=${API_KEY}&language=es-MX&sort_by=popularity.desc&with_people=${actorId}`
+      ).then((res) => res.json());
+
+      setMovies(results);
+      
+      // Hacemos scroll arriba para que vea los resultados
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+    } catch (error) {
+      console.error("Error buscando películas del actor:", error);
     }
   };
 
@@ -398,7 +422,12 @@ function App() {
                       <button className="cast-arrow-btn" onClick={() => scrollCast("left")}>&#10094;</button>
                       <div className="cast-scroll-area" ref={castCarouselRef}>
                         {cast.map((actor) => actor.profile_path && (
-                            <div key={actor.id} className="cast-card">
+                            <div 
+                                key={actor.id} 
+                                className="cast-card" 
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => fetchMoviesByActor(actor.id, actor.name)}
+                            >
                               <img src={`${IMAGE_PATH_POSTER}${actor.profile_path}`} alt={actor.name} className="cast-img"/>
                               <p className="actor-name">{actor.name}</p>
                               <p className="character-name">{actor.character}</p>
