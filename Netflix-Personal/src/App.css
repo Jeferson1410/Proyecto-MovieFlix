@@ -736,6 +736,25 @@ body {
   height: 280px; /* Un poco más pequeño que en el carrusel */
 }
 
+/* Contenedor para posicionar el círculo */
+.rating-circle-container {
+  position: relative;
+  display: inline-block;
+  background-color: #081c22; /* Fondo oscuro igual que TMDB */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.5);
+}
+
+/* Ajuste para cuando lo pongas sobre una tarjeta de película */
+.movie-card .rating-circle-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
 /* =========================================
    11. NOTIFICACIÓN TOAST (Feedback)
    ========================================= */

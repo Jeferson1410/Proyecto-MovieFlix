@@ -1,64 +1,46 @@
 import { useEffect, useState, useRef } from "react";
 import "./App.css";
 
+// Importamos los nuevos componentes
+import Navbar from "./components/Navbar";
+import MovieCard from "./components/MovieCard";
+import CategoryRow from "./components/CategoryRow";
+import RatingCircle from "./components/RatingCircle"; // Asumiendo que está en src/
+
 // --- UTILIDAD DE NORMALIZACIÓN ---
 const cleanText = (text) => {
   if (!text) return "";
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-};
-
-// Componente auxiliar para imágenes
-const MovieImage = ({ src, alt, className }) => {
-  const [loaded, setLoaded] = useState(false);
-
-  return (
-    <div className={`img-container ${className}`}>
-      {!loaded && <div className="skeleton"></div>}
-      <img 
-        src={src} 
-        alt={alt} 
-        className={`${className} ${loaded ? 'img-loaded' : 'img-loading'}`}
-        onLoad={() => setLoaded(true)} 
-        loading="lazy"
-      />
-    </div>
-  );
+  return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 };
 
 function App() {
   // --- ESTADOS PRINCIPALES ---
-  const [movies, setMovies] = useState([]); // Tendencias y Resultados de búsqueda
+  const [movies, setMovies] = useState([]); 
   const [heroMovie, setHeroMovie] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [favorites, setFavorites] = useState([]);
-  const [similarMovies, setSimilarMovies] = useState([]); // Nuevo estado para similares
+  const [similarMovies, setSimilarMovies] = useState([]); 
 
-  // Estado para Categoría Seleccionada (Grid)
   const [categoryTitle, setCategoryTitle] = useState(null); 
-
-  // Estado para Notificaciones
   const [notification, setNotification] = useState(null);
 
-  // Categorías (Carruseles)
+  // Categorías
   const [actionMovies, setActionMovies] = useState([]);
   const [comedyMovies, setComedyMovies] = useState([]);
   const [animationMovies, setAnimationMovies] = useState([]);
   const [scifiMovies, setScifiMovies] = useState([]);
 
-  // Estados de UI (Detalle y Reproductor)
+  // UI Detalle
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [playTrailer, setPlayTrailer] = useState(false);
   const [trailerKey, setTrailerKey] = useState(null);
   const [cast, setCast] = useState([]);
 
-  // --- ESTADOS PARA TRADUCCIÓN ---
-  const [translatedOverview, setTranslatedOverview] = useState(""); // Guarda el texto en español
-  const [isTranslating, setIsTranslating] = useState(false);      // Para mostrar "Cargando..."
+  // Traducción
+  const [translatedOverview, setTranslatedOverview] = useState(""); 
+  const [isTranslating, setIsTranslating] = useState(false);      
 
-  // --- REFERENCIAS (Scroll) ---
+  // Refs
   const carouselRef = useRef(null);     
   const castCarouselRef = useRef(null); 
   const actionRef = useRef(null);
@@ -66,13 +48,13 @@ function App() {
   const animationRef = useRef(null);
   const scifiRef = useRef(null);
 
-  // --- CONSTANTES ---
+  // Constantes
   const API_URL = "https://api.themoviedb.org/3";
   const API_KEY = import.meta.env.VITE_API_KEY; 
   const IMAGE_PATH = "https://image.tmdb.org/t/p/original";
   const IMAGE_PATH_POSTER = "https://image.tmdb.org/t/p/w500";
 
-  // --- 1. FUNCIÓN DE BÚSQUEDA Y TENDENCIAS ---
+  // --- LOGICA (Se mantiene igual) ---
   const fetchMovies = async (searchKey) => {
     const type = searchKey ? "search/movie" : "trending/movie/week";
     try {
@@ -82,40 +64,31 @@ function App() {
 
       let finalResults = apiResults || [];
 
-      // Filtrado local para mejorar la búsqueda
       if (searchKey) {
         const cleanSearch = cleanText(searchKey);
-        const allLocalMovies = [
-            ...actionMovies, ...comedyMovies, ...animationMovies, ...scifiMovies
-        ];
+        const allLocalMovies = [ ...actionMovies, ...comedyMovies, ...animationMovies, ...scifiMovies ];
         const localMatches = allLocalMovies.filter(movie => 
             cleanText(movie.title).includes(cleanSearch)
         );
         const combined = [...finalResults, ...localMatches];
-        // Eliminar duplicados por ID
         const uniqueResults = Array.from(new Map(combined.map(m => [m.id, m])).values());
         finalResults = uniqueResults;
       }
 
       setMovies(finalResults);
 
-      // Actualizar Hero solo si estamos en inicio
       if (!searchKey && !categoryTitle && finalResults.length > 0) {
         const randomIndex = Math.floor(Math.random() * finalResults.length);
         setHeroMovie(finalResults[randomIndex]);
         fetchMovieVideo(finalResults[randomIndex].id);
       }
-    } catch (error) {
-       console.log(error);
-    }
+    } catch (error) { console.log(error); }
   };
 
-  // --- 2. FUNCIÓN PARA BUSCAR VIDEO (TRAILER) ---
   const fetchMovieVideo = async (id) => {
     try {
       let response = await fetch(`${API_URL}/movie/${id}/videos?api_key=${API_KEY}&language=es-MX`).then((res) => res.json());
       if (!response.results?.length) {
-        // Si no hay en español, intentar en inglés
         response = await fetch(`${API_URL}/movie/${id}/videos?api_key=${API_KEY}&language=en-US`).then((res) => res.json());
       }
       if (response.results) {
@@ -126,7 +99,6 @@ function App() {
     } catch (error) { console.log(error); }
   };
 
-  // --- 3. FUNCIÓN PARA BUSCAR REPARTO ---
   const fetchMovieCast = async (id) => {
     try {
       const { cast } = await fetch(`${API_URL}/movie/${id}/credits?api_key=${API_KEY}&language=es-MX`).then((res) => res.json());
@@ -134,60 +106,35 @@ function App() {
     } catch (error) { console.log(error); }
   };
 
-  // --- 4. FUNCIÓN PARA BUSCAR SIMILARES (MEJORADA) ---
   const fetchSimilarMovies = async (currentMovie) => {
     try {
-      // Usamos el endpoint de recommendations que es más inteligente
       const response = await fetch(`${API_URL}/movie/${currentMovie.id}/recommendations?api_key=${API_KEY}&language=es-MX`);
       const data = await response.json();
-      
       if (data.results) {
-        // FILTRO DE CALIDAD:
-        // 1. Que tenga póster (para que no se vea feo).
-        // 2. Que comparta al menos un género con la película que estamos viendo.
         const filtered = data.results.filter(item => 
-           item.poster_path && 
-           item.genre_ids && 
-           currentMovie.genre_ids &&
+           item.poster_path && item.genre_ids && currentMovie.genre_ids &&
            item.genre_ids.some(genreId => currentMovie.genre_ids.includes(genreId))
         );
-
-        // Guardamos solo las 6 mejores que pasaron el filtro
         setSimilarMovies(filtered.slice(0, 6));
       } else {
         setSimilarMovies([]);
       }
-    } catch (error) {
-      console.error("Error buscando similares:", error);
-    }
+    } catch (error) { console.error("Error buscando similares:", error); }
   };
 
-  // --- 5. BUSCAR PELÍCULAS DE UN ACTOR ---
   const fetchMoviesByActor = async (actorId, actorName) => {
     try {
-      // Cerramos el modal actual
       closeDetail();
-      
-      // Cambiamos el título de la grilla para que el usuario sepa qué está viendo
       setCategoryTitle(`Películas de: ${actorName}`);
-      setSearchTerm(""); // Limpiamos búsqueda de texto
-      
-      // Endpoint: Discover filtrando por persona (with_people)
+      setSearchTerm("");
       const { results } = await fetch(
         `${API_URL}/discover/movie?api_key=${API_KEY}&language=es-MX&sort_by=popularity.desc&with_people=${actorId}`
       ).then((res) => res.json());
-
       setMovies(results);
-      
-      // Hacemos scroll arriba para que vea los resultados
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      
-    } catch (error) {
-      console.error("Error buscando películas del actor:", error);
-    }
+    } catch (error) { console.error(error); }
   };
 
-  // Helper para cargar categorías iniciales
   const fetchByGenre = async (genreId, setState) => {
     try {
       const { results } = await fetch(
@@ -197,7 +144,6 @@ function App() {
     } catch (error) { console.log(error); }
   };
 
-  // Helper para cargar Grid de Categoría
   const loadCategoryGrid = async (genreId, title) => {
     setCategoryTitle(title); 
     setSearchTerm("");       
@@ -208,29 +154,22 @@ function App() {
         setMovies(results); 
     } catch (error) { console.log(error); }
   };
-// --- FUNCIÓN CARGAR MÁS (PAGINACIÓN) ---
+
   const loadMore = async (genreId, currentList, setList) => {
-    // Calculamos la siguiente página matemáticamente
     const nextPage = Math.floor(currentList.length / 20) + 1;
-    
     try {
       const url = `${API_URL}/discover/movie?api_key=${API_KEY}&language=es-MX&sort_by=popularity.desc&include_adult=false&with_genres=${genreId}&page=${nextPage}`;
       const { results } = await fetch(url).then(res => res.json());
-      
-      // Añadimos las nuevas a las que ya teníamos (Spread Operator)
       setList([...currentList, ...results]); 
-    } catch (error) {
-      console.error("Error cargando más:", error);
-    }
+    } catch (error) { console.error(error); }
   };
-  // Vuelta al inicio
+
   const goHome = () => {
     setCategoryTitle(null);
     setSearchTerm("");
     fetchMovies(); 
   };
 
-  // Efecto inicial
   useEffect(() => {
     fetchMovies();
     fetchByGenre(28, setActionMovies);
@@ -241,12 +180,9 @@ function App() {
     if (movieFavorites) setFavorites(movieFavorites);
   }, []);
 
-  // --- GESTIÓN DE FAVORITOS Y NOTIFICACIONES ---
   const showNotification = (message) => {
     setNotification(message);
-    setTimeout(() => {
-        setNotification(null);
-    }, 3000); 
+    setTimeout(() => setNotification(null), 3000); 
   };
 
   const toggleFavorite = (movie) => {
@@ -274,7 +210,6 @@ function App() {
     fetchMovies(searchTerm);
   };
 
-  // Funciones de Scroll
   const scroll = (ref, direction) => {
     if (ref.current) ref.current.scrollBy({ left: direction === "left" ? -800 : 800, behavior: "smooth" });
   };
@@ -282,56 +217,47 @@ function App() {
     if (castCarouselRef.current) castCarouselRef.current.scrollBy({ left: direction === "left" ? -350 : 350, behavior: "smooth" });
   };
 
-  // --- SELECCIÓN DE PELÍCULA (Abre Detalle) ---
   const selectMovie = async (movie, playNow = false) => {
     setTranslatedOverview("");
     setPlayTrailer(false);
     setTrailerKey(null);
     setCast([]);
-    setSimilarMovies([]); // Limpiamos similares anteriores
+    setSimilarMovies([]); 
     setSelectedMovie(movie);
-    document.body.style.overflow = "hidden"; // Bloquea el scroll del fondo
+    document.body.style.overflow = "hidden"; 
     
-    // Ejecutamos las llamadas en paralelo
     await Promise.all([
         fetchMovieVideo(movie.id),
         fetchMovieCast(movie.id),
-        fetchSimilarMovies(movie) // <--- Llamada a la nueva función corregida
+        fetchSimilarMovies(movie)
     ]);
 
     if (playNow) setPlayTrailer(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Sube el scroll dentro del modal si es necesario
+    window.scrollTo({ top: 0, behavior: 'smooth' }); 
   };
 
   const closeDetail = () => {
     setSelectedMovie(null);
     setPlayTrailer(false);
-    document.body.style.overflow = "auto"; // Reactiva el scroll
+    document.body.style.overflow = "auto";
   };
 
-  // Función para traducir usando una API gratuita
   const handleTranslate = async (text) => {
     if (!text) return;
     setIsTranslating(true);
     try {
-      // Usamos la API de MyMemory (gratuita para uso moderado)
-      // Traduce de Inglés (en) a Español (es)
       const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|es`);
       const data = await response.json();
-      
-      // Guardamos la traducción
       setTranslatedOverview(data.responseData.translatedText);
-    } catch (error) {
-      console.error("Error al traducir:", error);
-    } finally {
-      setIsTranslating(false);
-    }
+    } catch (error) { console.error("Error al traducir:", error);
+    } finally { setIsTranslating(false); }
   };
 
+  // --- RENDER ---
   return (
     <div className="app-container">
       
-      {/* --- NOTIFICACIÓN TOAST --- */}
+      {/* NOTIFICACIÓN */}
       {notification && (
         <div className="toast-notification">
             <span className="toast-icon">ℹ️</span> {notification}
@@ -339,7 +265,9 @@ function App() {
       )}
 
       {selectedMovie ? (
-        /* ================= VISTA DETALLE (MODAL COMPLETO) ================= */
+        /* ================= VISTA DETALLE ================= */
+        /* (Esta parte es tan compleja que la dejaremos aquí por ahora, 
+           pero usa MovieImage y RatingCircle si quieres) */
         <div className="movie-detail">
           <button className="back-btn" onClick={closeDetail}>← Volver</button>
 
@@ -347,10 +275,9 @@ function App() {
              <div className="video-overlay" onClick={() => setPlayTrailer(false)} 
                 style={{position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(5px)'}}>
                 <div className="video-content-wrapper" onClick={(e) => e.stopPropagation()} 
-                    style={{position: 'relative', width: '90%', maxWidth: '1200px', aspectRatio: '16/9', backgroundColor: '#000', boxShadow: '0 0 30px rgba(0,0,0,0.5)', borderRadius: '8px', overflow: 'hidden'}}>
-                    <button onClick={() => setPlayTrailer(false)}
-                        style={{position: 'absolute', top: '15px', right: '15px', background: 'rgba(0,0,0,0.6)', border: 'none', color: 'white', fontSize: '24px', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>✕</button>
-                    <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`} title="Trailer" frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe>
+                   style={{position: 'relative', width: '90%', maxWidth: '1200px', aspectRatio: '16/9', backgroundColor: '#000', boxShadow: '0 0 30px rgba(0,0,0,0.5)', borderRadius: '8px', overflow: 'hidden'}}>
+                   <button onClick={() => setPlayTrailer(false)} style={{position: 'absolute', top: '15px', right: '15px', background: 'rgba(0,0,0,0.6)', border: 'none', color: 'white', fontSize: '24px', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', zIndex: 10}}>✕</button>
+                   <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`} title="Trailer" frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe>
                 </div>
              </div>
           ) : (
@@ -359,7 +286,13 @@ function App() {
               <div className="detail-hero" style={{ backgroundImage: `url("${IMAGE_PATH}${selectedMovie.backdrop_path}")` }}>
                 <div className="movie-detail-overlay"></div>
                 <div className="detail-content">
-                    <img src={`${IMAGE_PATH_POSTER}${selectedMovie.poster_path}`} alt={selectedMovie.title} className="detail-poster"/>
+                    <div style={{position: 'relative'}}>
+                        <img src={`${IMAGE_PATH_POSTER}${selectedMovie.poster_path}`} alt={selectedMovie.title} className="detail-poster"/>
+                        <div style={{ position: 'absolute', top: '-10px', right: '-10px' }}>
+                           <RatingCircle rating={selectedMovie.vote_average} />
+                        </div>
+                    </div>
+                    
                     <div className="detail-info">
                       <h1 className="detail-title">{selectedMovie.title}</h1>
                       <div style={{ display: 'flex', gap: '15px', color: '#ccc', fontSize: '0.9rem', marginBottom: '15px' }}>
@@ -367,53 +300,30 @@ function App() {
                         <span>•</span>
                         <span style={{ border: '1px solid #ccc', padding: '0 4px', fontSize: '0.7rem', borderRadius: '2px' }}>HD</span>
                       </div>
+                      
+                      {/* Lógica de traducción */}
                       <div className="overview-container">
-                      <p className="detail-overview">
-                          {/* Si ya tradujimos, mostramos eso. Si no, mostramos el original */}
-                          {translatedOverview ? translatedOverview : selectedMovie.overview}
-                      </p>
+                          <p className="detail-overview">
+                              {translatedOverview ? translatedOverview : selectedMovie.overview}
+                          </p>
+                          {!translatedOverview && selectedMovie.overview && (
+                              <button onClick={() => handleTranslate(selectedMovie.overview)} disabled={isTranslating} className="btn-translate">
+                                  {isTranslating ? "🔄 Traduciendo..." : "🌐 Traducir al español"}
+                              </button>
+                          )}
+                      </div>
 
-                      {/* Botón de traducir: Solo aparece si NO hay traducción aún y hay texto para traducir */}
-                      {!translatedOverview && selectedMovie.overview && (
-                          <button 
-                              onClick={() => handleTranslate(selectedMovie.overview)}
-                              disabled={isTranslating}
-                              style={{
-                                  marginTop: '10px',
-                                  background: 'rgba(255, 255, 255, 0.1)',
-                                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                                  color: 'white',
-                                  padding: '8px 16px',
-                                  borderRadius: '20px',
-                                  cursor: 'pointer',
-                                  fontSize: '0.85rem',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '5px',
-                                  transition: 'all 0.3s ease'
-                              }}
-                          >
-                              {isTranslating ? (
-                                  <span>🔄 Traduciendo...</span>
-                              ) : (
-                                  <span>🌐 Traducir al español</span>
-                              )}
-                          </button>
-                      )}
-                  </div>
                       <div className="hero-buttons">
                           {trailerKey ? <button className="btn btn-play" onClick={() => setPlayTrailer(true)}>▶ Ver Trailer</button> : <button className="btn btn-info" disabled>No Disponible</button>}
                           <button onClick={() => toggleFavorite(selectedMovie)} className="btn btn-fav">
                           {isFav(selectedMovie.id) ? "❤️ En mi lista" : "➕ Agregar a Mi lista"} </button>
                       </div>
-                      <p style={{marginTop: '20px', color: '#aaa'}}>Valoración: ⭐ {selectedMovie.vote_average}</p>
                     </div>
                 </div>
               </div>
 
-              {/* CONTENIDO INFERIOR DEL DETALLE */}
+              {/* CONTENIDO INFERIOR */}
               <div className="movie-content-below">
-                 
                  {/* REPARTO */}
                  {cast.length > 0 && (
                   <div className="cast-section-wrapper">
@@ -422,12 +332,7 @@ function App() {
                       <button className="cast-arrow-btn" onClick={() => scrollCast("left")}>&#10094;</button>
                       <div className="cast-scroll-area" ref={castCarouselRef}>
                         {cast.map((actor) => actor.profile_path && (
-                            <div 
-                                key={actor.id} 
-                                className="cast-card" 
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => fetchMoviesByActor(actor.id, actor.name)}
-                            >
+                            <div key={actor.id} className="cast-card" onClick={() => fetchMoviesByActor(actor.id, actor.name)}>
                               <img src={`${IMAGE_PATH_POSTER}${actor.profile_path}`} alt={actor.name} className="cast-img"/>
                               <p className="actor-name">{actor.name}</p>
                               <p className="character-name">{actor.character}</p>
@@ -437,92 +342,48 @@ function App() {
                       <button className="cast-arrow-btn" onClick={() => scrollCast("right")}>&#10095;</button>
                     </div>
                   </div>
-                )}
+                 )}
 
-                {/* --- SECCIÓN DE PELÍCULAS SIMILARES --- */}
-                <div className="container" style={{padding: '20px 40px'}}>
-                  <h3 style={{color: 'white', marginBottom: '20px', borderLeft: '4px solid #e50914', paddingLeft: '10px'}}>También podría gustarte</h3>
-                  
-                  <div className="row" style={{display: 'flex', flexWrap: 'wrap', gap: '15px', justifyContent: 'center'}}>
-                    {similarMovies.slice(0, 6).map((similar) => (
-                      <div 
-                        key={similar.id} 
-                        style={{ width: '160px', cursor: "pointer", transition: 'transform 0.3s' }}
-                        className="similar-card"
-                        onClick={() => selectMovie(similar)}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                      >
-                        <div style={{position: 'relative', borderRadius: '8px', overflow: 'hidden'}}>
-                          <img
-                            src={`${IMAGE_PATH_POSTER + similar.poster_path}`}
-                            alt={similar.title}
-                            style={{ width: "100%", height: "240px", objectFit: "cover" }}
-                          />
-                        </div>
-                        <div className="mt-2">
-                          <p style={{color: '#ddd', fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '5px'}}>{similar.title}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {similarMovies.length === 0 && (
-                    <p style={{color: 'gray'}}>No se encontraron títulos similares.</p>
-                  )}
-                </div>
-
+                 {/* SIMILARES REUTILIZANDO MOVIECARD */}
+                 <div className="container" style={{padding: '20px 40px'}}>
+                   <h3 style={{color: 'white', marginBottom: '20px', borderLeft: '4px solid #e50914', paddingLeft: '10px'}}>También podría gustarte</h3>
+                   <div className="row" style={{display: 'flex', flexWrap: 'wrap', gap: '15px', justifyContent: 'center'}}>
+                     {similarMovies.slice(0, 6).map((similar) => (
+                       <MovieCard key={similar.id} movie={similar} onClick={selectMovie} imagePath={IMAGE_PATH_POSTER} />
+                     ))}
+                   </div>
+                   {similarMovies.length === 0 && <p style={{color: 'gray'}}>No se encontraron títulos similares.</p>}
+                 </div>
               </div>
             </>
           )}
         </div>
       ) : (
-        /* ================= VISTA PRINCIPAL (HOME) ================= */
+        /* ================= VISTA PRINCIPAL ================= */
         <>
-          <nav className="navbar">
-            <h2 className="logo" onClick={goHome}>MATHUASSFLIX</h2>
-            
-            <div className="nav-links">
-                <span className="nav-link" onClick={goHome}>Inicio</span>
-                <span className="nav-link" onClick={() => loadCategoryGrid(28, "Acción")}>Acción</span>
-                <span className="nav-link" onClick={() => loadCategoryGrid(35, "Comedia")}>Comedia</span>
-                <span className="nav-link" onClick={() => loadCategoryGrid(16, "Animación")}>Animación</span>
-                <span className="nav-link" onClick={() => loadCategoryGrid(878, "Ciencia Ficción")}>Sci-Fi</span>
-            </div>
+          <Navbar 
+            goHome={goHome} 
+            loadCategoryGrid={loadCategoryGrid} 
+            searchTerm={searchTerm} 
+            setSearchTerm={setSearchTerm} 
+            handleSearch={handleSearch} 
+          />
 
-            <form onSubmit={handleSearch} className="search-box">
-              <input 
-                type="text" 
-                placeholder="Buscar..." 
-                value={searchTerm} 
-                onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    if (e.target.value === "") fetchMovies(); 
-                }}
-              />
-              <button type="submit">🔍</button>
-            </form>
-          </nav>
-
-          {/* RENDERIZADO CONDICIONAL: ¿HOME O GRID? */}
           {searchTerm || categoryTitle ? (
-            /* --- VISTA GRID (Búsqueda o Categoría) --- */
+            /* --- VISTA GRID --- */
             <div className="grid-container">
                 <h2 className="grid-title">
                     {searchTerm ? `Resultados de búsqueda: "${searchTerm}"` : `${categoryTitle}`}
                 </h2>
                 <div className="movie-grid">
                     {movies.map((movie) => movie.poster_path && (
-                        <div key={movie.id} className="movie-card" onClick={() => selectMovie(movie)}>
-                            <MovieImage src={`${IMAGE_PATH_POSTER + movie.poster_path}`} alt={movie.title} className="movie-img" />
-                            <div className="movie-info"><h4>{movie.title}</h4></div>
-                        </div>
+                        <MovieCard key={movie.id} movie={movie} onClick={selectMovie} imagePath={IMAGE_PATH_POSTER} />
                     ))}
                     {movies.length === 0 && <p style={{color: 'gray'}}>No se encontraron resultados.</p>}
                 </div>
             </div>
           ) : (
-            /* --- VISTA HOME CLÁSICA (Carruseles) --- */
+            /* --- VISTA HOME (Ahora super limpia gracias a CategoryRow) --- */
             <>
               {heroMovie && (
                 <div className="hero" style={{ backgroundImage: `url("${IMAGE_PATH}${heroMovie.backdrop_path}")` }}>
@@ -539,119 +400,30 @@ function App() {
                 </div>
               )}
 
-              {/* SECCIÓN DE FAVORITOS */}
               {favorites.length > 0 && (
-                <div className="carousel-container">
-                  <h2 className="section-title">Mi Lista de Favoritos❤️</h2>
-                  <div className="carousel-wrapper">
-                    <div className="carousel" style={{ overflowX: 'auto', display: 'flex', gap: '10px', paddingBottom: '20px' }}>
-                      {favorites.map((movie) => (
-                          <div key={movie.id} className="movie-card" onClick={() => selectMovie(movie)} style={{ flex: '0 0 auto' }}>
-                          <MovieImage src={`${IMAGE_PATH_POSTER + movie.poster_path}`} alt={movie.title} className="movie-img" />
-                          <div className="movie-info"><h4>{movie.title}</h4></div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                 <CategoryRow 
+                    title="Mi Lista de Favoritos ❤️" 
+                    movies={favorites} 
+                    scrollRef={{ current: null }} // Favoritos no tiene ref de scroll horizontal con flechas en tu código original, se mueve nativo
+                    onScroll={() => {}} 
+                    onSelectMovie={selectMovie} 
+                    imagePath={IMAGE_PATH_POSTER}
+                 />
               )}
 
-              {/* Carruseles normales */}
-              <div className="carousel-container">
-                <h2 className="section-title">Tendencias ahora</h2>
-                <div className="carousel-wrapper">
-                  <button className="arrow-btn arrow-left" onClick={() => scroll(carouselRef, "left")}>&#10094;</button>
-                  <div className="carousel" ref={carouselRef}>
-                    {movies.map((movie) => movie.poster_path && (
-                        <div key={movie.id} className="movie-card" onClick={() => selectMovie(movie)}>
-                          <MovieImage src={`${IMAGE_PATH_POSTER + movie.poster_path}`} alt={movie.title} className="movie-img" />
-                          <div className="movie-info"><h4>{movie.title}</h4></div>
-                        </div>
-                    ))}
-                  </div>
-                  <button className="arrow-btn arrow-right" onClick={() => scroll(carouselRef, "right")}>&#10095;</button>
-                </div>
-              </div>
-
-              <div className="carousel-container">
-                <h2 className="section-title">Acción y Adrenalina</h2>
-                <div className="carousel-wrapper">
-                  <button className="arrow-btn arrow-left" onClick={() => scroll(actionRef, "left")}>&#10094;</button>
-                  <div className="carousel" ref={actionRef}>
-                    {actionMovies.map((movie) => movie.poster_path && (
-                      <div key={movie.id} className="movie-card" onClick={() => selectMovie(movie)}>
-                        <MovieImage src={`${IMAGE_PATH_POSTER + movie.poster_path}`} alt={movie.title} className="movie-img" />
-                        <div className="movie-info"><h4>{movie.title}</h4></div>
-                      </div>
-                    ))}
-                    {/* 2. EL BOTÓN MÁGICO AL FINAL */}
-                    <div className="load-more-card" onClick={() => loadMore(28, actionMovies, setActionMovies)}>
-                      <span className="plus-icon">+</span>
-                      <span>Cargar más</span>
-                    </div>
-                  </div>
-                  <button className="arrow-btn arrow-right" onClick={() => scroll(actionRef, "right")}>&#10095;</button>
-                </div>
-              </div>
+              <CategoryRow title="Tendencias ahora" movies={movies} scrollRef={carouselRef} onScroll={scroll} onSelectMovie={selectMovie} imagePath={IMAGE_PATH_POSTER} />
               
-              <div className="carousel-container">
-                <h2 className="section-title">Comedias Populares</h2>
-                <div className="carousel-wrapper">
-                  <button className="arrow-btn arrow-left" onClick={() => scroll(comedyRef, "left")}>&#10094;</button>
-                  <div className="carousel" ref={comedyRef}>
-                    {comedyMovies.map((movie) => movie.poster_path && (
-                      <div key={movie.id} className="movie-card" onClick={() => selectMovie(movie)}>
-                        <MovieImage src={`${IMAGE_PATH_POSTER + movie.poster_path}`} alt={movie.title} className="movie-img" />
-                        <div className="movie-info"><h4>{movie.title}</h4></div>
-                      </div>
-                    ))}
-                    <div className="load-more-card" onClick={() => loadMore(35, comedyMovies, setComedyMovies)}>
-                      <span className="plus-icon">+</span>
-                      <span>Cargar más</span>
-                    </div>
-                  </div>      
-                  <button className="arrow-btn arrow-right" onClick={() => scroll(comedyRef, "right")}>&#10095;</button>
-                </div>
-              </div>
+              <CategoryRow title="Acción y Adrenalina" movies={actionMovies} scrollRef={actionRef} onScroll={scroll} onSelectMovie={selectMovie} imagePath={IMAGE_PATH_POSTER} 
+                 onLoadMore={() => loadMore(28, actionMovies, setActionMovies)} />
               
-               <div className="carousel-container">
-                <h2 className="section-title">Películas de Animación</h2>
-                <div className="carousel-wrapper">
-                  <button className="arrow-btn arrow-left" onClick={() => scroll(animationRef, "left")}>&#10094;</button>
-                  <div className="carousel" ref={animationRef}>
-                    {animationMovies.map((movie) => movie.poster_path && (
-                      <div key={movie.id} className="movie-card" onClick={() => selectMovie(movie)}>
-                        <MovieImage src={`${IMAGE_PATH_POSTER + movie.poster_path}`} alt={movie.title} className="movie-img" />
-                        <div className="movie-info"><h4>{movie.title}</h4></div>
-                      </div>
-                    ))}
-                    <div className="load-more-card" onClick={() => loadMore(16, animationMovies, setAnimationMovies)}>
-                      <span className="plus-icon">+</span>
-                      <span>Cargar más</span>
-                    </div>
-                  </div>
-                  <button className="arrow-btn arrow-right" onClick={() => scroll(animationRef, "right")}>&#10095;</button>
-                </div>
-              </div>
-              <div className="carousel-container">
-                <h2 className="section-title">Ciencia Ficción y Fantasía</h2>
-                <div className="carousel-wrapper">
-                  <button className="arrow-btn arrow-left" onClick={() => scroll(scifiRef, "left")}>&#10094;</button>
-                  <div className="carousel" ref={scifiRef}>
-                    {scifiMovies.map((movie) => movie.poster_path && (
-                      <div key={movie.id} className="movie-card" onClick={() => selectMovie(movie)}>
-                        <MovieImage src={`${IMAGE_PATH_POSTER + movie.poster_path}`} alt={movie.title} className="movie-img" />
-                        <div className="movie-info"><h4>{movie.title}</h4></div>
-                      </div>
-                    ))}
-                    <div className="load-more-card" onClick={() => loadMore(878, scifiMovies, setScifiMovies)}>
-                      <span className="plus-icon">+</span>
-                      <span>Cargar más</span>
-                    </div>
-                  </div>
-                  <button className="arrow-btn arrow-right" onClick={() => scroll(scifiRef, "right")}>&#10095;</button>
-                </div>
-              </div>
+              <CategoryRow title="Comedias Populares" movies={comedyMovies} scrollRef={comedyRef} onScroll={scroll} onSelectMovie={selectMovie} imagePath={IMAGE_PATH_POSTER} 
+                 onLoadMore={() => loadMore(35, comedyMovies, setComedyMovies)} />
+              
+              <CategoryRow title="Películas de Animación" movies={animationMovies} scrollRef={animationRef} onScroll={scroll} onSelectMovie={selectMovie} imagePath={IMAGE_PATH_POSTER} 
+                 onLoadMore={() => loadMore(16, animationMovies, setAnimationMovies)} />
+              
+              <CategoryRow title="Ciencia Ficción" movies={scifiMovies} scrollRef={scifiRef} onScroll={scroll} onSelectMovie={selectMovie} imagePath={IMAGE_PATH_POSTER} 
+                 onLoadMore={() => loadMore(878, scifiMovies, setScifiMovies)} />
             </>
           )}
         </>
