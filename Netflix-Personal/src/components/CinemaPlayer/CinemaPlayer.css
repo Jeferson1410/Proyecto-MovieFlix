@@ -1,0 +1,309 @@
+.cinema-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(4, 2, 10, 0.95);
+    backdrop-filter: blur(25px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cinema-container {
+    position: relative;
+    width: 95vw;
+    height: 95vh;
+    max-width: 1600px;
+    max-height: 900px;
+    background: #000;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 100px rgba(127, 13, 242, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- AMBILIGHT EFFECT --- */
+.ambilight-wrapper {
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.ambilight-blur {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(100px) saturate(1.5) brightness(0.4);
+    opacity: 0.4;
+    animation: ambilightPulse 10s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+@keyframes ambilightPulse {
+    0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: scale(1.1) rotate(2deg);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1.05) rotate(-1deg);
+        opacity: 0.5;
+    }
+}
+
+.video-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    z-index: 2;
+    /* Asegura estar sobre el ambilight */
+}
+
+#youtube-player {
+    width: 100%;
+    height: 140%;
+    /* Increase height significantly to crop YouTube bars */
+    transform: translateY(-14%);
+    /* Center the video and hide top/bottom info bars */
+    pointer-events: none;
+    /* Let clicks pass to play-overlay or handle via wrapper */
+}
+
+/* Masks to hide YouTube UI */
+.player-mask-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    /* Reducido de 140px */
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+    z-index: 5;
+    pointer-events: none;
+}
+
+.player-mask-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    /* Reducido drásticamente de 140px para subtítulos */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+    z-index: 5;
+    pointer-events: none;
+}
+
+.play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(127, 13, 242, 0.4);
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    z-index: 20;
+    box-shadow: 0 0 50px var(--accent-purple-glow);
+}
+
+.player-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 50px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.8) 50%, transparent 100%);
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.player-info h3 {
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.player-meta {
+    font-size: 14px;
+    color: var(--accent-purple);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Close Player Button */
+.close-player {
+    background: #ff4757;
+    border: none;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 30px rgba(255, 71, 87, 0.6);
+    z-index: 1001;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.close-player:hover {
+    background: #ff2e44;
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 0 50px rgba(255, 71, 87, 0.9);
+}
+
+.close-player span {
+    display: inline-block;
+}
+
+.player-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 40px;
+    /* Reducido padding superior */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.player-control-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.player-control-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--accent-purple);
+    transform: scale(1.1);
+}
+
+.footer-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.time-display {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    min-width: 45px;
+    text-align: center;
+}
+
+.progress-container {
+    flex: 1;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.progress-rail {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    position: relative;
+    transition: height 0.2s ease;
+}
+
+.progress-container:hover .progress-rail {
+    height: 8px;
+}
+
+.progress-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: var(--accent-purple);
+    border-radius: 3px;
+    box-shadow: 0 0 15px var(--accent-purple-glow);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.progress-knob {
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    margin-right: -7px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.progress-container:hover .progress-knob {
+    opacity: 1;
+}
+
+.footer-left,
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    .cinema-container {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        max-width: none;
+        max-height: none;
+    }
+
+    .player-header,
+    .player-footer {
+        padding: 20px;
+    }
+}

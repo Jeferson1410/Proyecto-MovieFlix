@@ -1,0 +1,574 @@
+/* CSS: Menú de Usuario estilo Stitch 'Premium' */
+
+.usermenu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    z-index: 10000;
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px;
+    animation: fadeInOverlay 0.3s ease-out;
+}
+
+@keyframes fadeInOverlay {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.usermenu-container {
+    width: 380px;
+    background: rgba(10, 10, 13, 0.9);
+    border: 1px solid #7c3aed;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(124, 58, 237, 0.3);
+    backdrop-filter: blur(25px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: fit-content;
+    max-height: 90vh;
+    animation: slideInMenu 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInMenu {
+    from {
+        transform: translateX(40px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.usermenu-container.extended {
+    width: 420px;
+}
+
+/* Header de la Modal */
+.usermenu-header {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.usermenu-header h3 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin: 0;
+    color: white;
+}
+
+.back-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.no-decoration {
+    text-decoration: none !important;
+}
+
+/* Perfil Estilo Stitch */
+.stitch-profile-header {
+    padding: 30px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(to bottom, rgba(124, 58, 237, 0.05), transparent);
+}
+
+.stitch-avatar-container {
+    width: 84px;
+    height: 84px;
+    position: relative;
+    margin-bottom: 16px;
+    padding: 4px;
+    background: #111;
+    border-radius: 50%;
+    border: 1px solid rgba(124, 58, 237, 0.3);
+}
+
+.stitch-avatar {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+}
+
+.stitch-avatar-glow {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #7c3aed, #db2777);
+    filter: blur(10px);
+    opacity: 0.4;
+    z-index: 1;
+}
+
+.stitch-user-info h4 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: #fff;
+}
+
+.stitch-status {
+    font-size: 10px;
+    font-weight: 800;
+    color: #7c3aed;
+    letter-spacing: 1.5px;
+    margin-top: 5px;
+    display: block;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(124, 58, 237, 0.4);
+}
+
+.center-text {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.stitch-manage-btn {
+    margin-top: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stitch-manage-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+/* Lista de Menús Stitch */
+.stitch-menu-list {
+    padding: 10px 0;
+}
+
+.stitch-menu-item {
+    width: 100%;
+    padding: 16px 24px;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #efefef;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.stitch-menu-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.item-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.item-icon-circle {
+    width: 32px;
+    height: 32px;
+    background: rgba(124, 58, 237, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7c3aed;
+}
+
+.item-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.stitch-progress {
+    width: 50px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.stitch-progress-fill {
+    height: 100%;
+    background: #7c3aed;
+}
+
+.stitch-badge {
+    background: #7c3aed;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 8px;
+}
+
+.item-chevron {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.stitch-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 10px 24px;
+}
+
+.help-icon-circle {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid #7c3aed;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #7c3aed;
+}
+
+.secondary-text {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.logout-red {
+    color: #ff4d4d;
+}
+
+.logout-red span {
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* Contenedor con scroll para contenido largo */
+.usermenu-content {
+    overflow-y: auto;
+    max-height: calc(90vh - 70px);
+}
+
+.usermenu-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.usermenu-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.usermenu-content::-webkit-scrollbar-thumb {
+    background: rgba(124, 58, 237, 0.3);
+    border-radius: 10px;
+}
+
+.usermenu-content::-webkit-scrollbar-thumb:hover {
+    background: #7c3aed;
+}
+
+/* Subvistas (Forms/History) */
+.settings-form,
+.history-view {
+    padding: 20px 24px 30px;
+}
+
+.input-group label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.input-group input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 10px;
+    color: white;
+    outline: none;
+}
+
+.btn-save {
+    width: 100%;
+    background: #7c3aed;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.history-item img {
+    width: 40px;
+    height: 60px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+/* Selector de Avatares Corregido */
+.avatar-selector-section {
+    margin-bottom: 25px;
+}
+
+.stitch-status {
+    font-size: 10px;
+    font-weight: 900;
+    color: #7c3aed;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+    background: linear-gradient(90deg, #7c3aed, #c084fc, #7c3aed);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+.section-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #7c3aed;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.avatar-option {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    padding: 4px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.avatar-option img {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.avatar-option:hover {
+    transform: scale(1.1);
+    border-color: rgba(124, 58, 237, 0.4);
+}
+
+.avatar-option.selected {
+    border-color: #7c3aed;
+    background: rgba(124, 58, 237, 0.1);
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+}
+
+.selected-check {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #7c3aed;
+    color: white;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.input-divider {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 25px 0 15px;
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.input-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.settings-intro {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+.settings-intro span {
+    color: #7c3aed;
+    font-weight: 700;
+}
+
+.input-help {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-top: 6px;
+}
+
+/* Estado Invitado Premium */
+.guest-card {
+    margin: 20px 24px 30px;
+    padding: 30px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.guest-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(124, 58, 237, 0.15) 0%, transparent 50%);
+    pointer-events: none;
+    animation: pulse 8s infinite alternate ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+.guest-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: var(--accent-purple);
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.2);
+}
+
+.guest-card h4 {
+    font-size: 18px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.guest-card p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.guest-login-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    background: var(--accent-purple) !important;
+    color: white !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+.guest-login-btn:hover {
+    background: #8b5cf6 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4) !important;
+}
+
+@media (max-width: 480px) {
+    .usermenu-overlay {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .usermenu-container {
+        width: 100%;
+        border-radius: 24px 24px 0 0;
+    }
+}

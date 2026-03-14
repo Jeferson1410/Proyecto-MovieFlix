@@ -1,0 +1,83 @@
+.smart-poster-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-darker);
+    border-radius: inherit;
+    cursor: inherit;
+}
+
+.smart-poster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.smart-poster-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(127, 13, 242, 0.05) 0%, rgba(127, 13, 242, 0.15) 100%);
+    color: var(--accent-purple);
+}
+
+.poster-placeholder-icon {
+    opacity: 0.4;
+    filter: drop-shadow(0 0 10px var(--accent-purple-glow));
+}
+
+.poster-loader {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-top-color: var(--accent-purple);
+    border-radius: 50%;
+    animation: spinPoster 1s linear infinite;
+}
+
+@keyframes spinPoster {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Variación para backdrops */
+.smart-poster-container.backdrop .smart-poster-placeholder {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.4), var(--bg-dark));
+}
+
+/* Soporte para temas */
+[data-theme='cyan'] .smart-poster-placeholder {
+    background: linear-gradient(135deg, rgba(0, 242, 255, 0.05), rgba(0, 242, 255, 0.15));
+    color: var(--accent-main);
+}
+
+[data-theme='cyan'] .poster-loader {
+    border-top-color: var(--accent-main);
+}
+
+[data-theme='red'] .smart-poster-placeholder {
+    background: linear-gradient(135deg, rgba(229, 9, 20, 0.05), rgba(229, 9, 20, 0.15));
+    color: var(--accent-main);
+}
+
+[data-theme='red'] .poster-loader {
+    border-top-color: var(--accent-main);
+}
+
+[data-theme='gold'] .smart-poster-placeholder {
+    background: linear-gradient(135deg, rgba(255, 173, 31, 0.05), rgba(255, 173, 31, 0.15));
+    color: var(--accent-main);
+}
+
+[data-theme='gold'] .poster-loader {
+    border-top-color: var(--accent-main);
+}

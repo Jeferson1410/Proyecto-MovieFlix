@@ -7,28 +7,31 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# --- Dependencias (NUNCA subir esto) ---
+# --- Dependencias ---
 node_modules
 .pnpm-store
 
 # --- Build de Producción ---
-# Vite genera la carpeta 'dist', Create React App usa 'build'
 dist
 dist-ssr
 build
 
-# --- Variables de Entorno (SEGURIDAD CRÍTICA) ---
-# Ignora cualquier archivo de configuración local que pueda tener tu API KEY
+# --- Variables de Entorno ---
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.firebase
+.firebaserc
+firebase.json
+firestore.indexes.json
+firestore.rules
 
-# Excepción: Si creas un archivo de ejemplo (sin claves reales), ese sí se sube
+# Excepción:
 !.env.example
 
-# --- Archivos del Sistema Operativo (Basura) ---
+# --- Archivos del Sistema Operativo ---
 .DS_Store
 Thumbs.db
 Desktop.ini
@@ -43,8 +46,8 @@ Desktop.ini
 *.sln
 *.sw?
 
-# --- Testing (Por si agregas pruebas en el futuro) ---
+# --- Testing ---
 coverage/
 
-# --- Vite Types (Si usaras TypeScript en el futuro) ---
+# --- Vite Types ---
 *.tsbuildinfo
