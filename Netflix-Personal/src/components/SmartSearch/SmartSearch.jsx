@@ -18,7 +18,6 @@ const SMART_MAPPING = {
     'fantasy': { type: 'movie', params: { genre: 14 } },
     'disney': { type: 'movie', params: { company: 2 } },
     'marvel': { type: 'movie', params: { company: 420 } },
-    'batman': { type: 'movie', params: { keyword: 364695 } },
     'oscar': { type: 'movie', params: { minRating: 7.7, minVotes: 2000 } }, // Estrategia de "Obras Maestras" para Oscar
 };
 
@@ -39,9 +38,14 @@ const SmartSearch = ({
     const [isListening, setIsListening] = useState(false); // Estado del micrófono
     const inputRef = useRef(null);                  // Referencia al campo de entrada
 
-    // Efecto para sincronizar la consulta inicial si existe
+    // Efecto para sincronizar la consulta inicial o resetear al cerrar
     useEffect(() => {
-        if (isOpen && initialQuery) setQuery(initialQuery);
+        if (isOpen) {
+            if (initialQuery) setQuery(initialQuery);
+        } else {
+            setQuery('');
+            setResults([]);
+        }
     }, [isOpen, initialQuery]);
 
     /**

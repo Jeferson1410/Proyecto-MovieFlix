@@ -3,6 +3,11 @@
     padding: 120px 40px 40px;
 }
 
+/* Si hay un FilterBar justo arriba, no necesitamos el padding-top masivo */
+.filter-bar + .grid-section {
+    padding-top: 0px;
+}
+
 .grid-title {
     font-size: 32px;
     font-weight: 800;
